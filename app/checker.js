@@ -1,34 +1,96 @@
-function batteryIsOk(temperature,  soc,  chargeRate) {
-    if(temperature < 0 || temperature > 45) {
-        console.log("Temperature is out of range!");
-        return false;
-    } else if(soc < 20 || soc > 80) {
-        console.log("State of Charge is out of range!");
-        return false;
-    } else if(chargeRate > 0.8) {
-        console.log("Charge Rate is out of range!");
-        return false;
-    }
-    return true;
-}
+import { getBatteryState, isBatteryOk } from "./battery.js";
+import { assertBatteryCondition } from "./test.js";
 
-function  ExpectTrue(expression) {
-    if(!expression) {
-        console.log("Expected true, but got false");
-        
-    }
-}
-function ExpectFalse(expression) {
-    if(expression) {
-        console.log("Expected false, but got true");
-        Environment.Exit(1);
-    }
-}
-function main() {
-    ExpectTrue(batteryIsOk(25, 70, 0.7));
-    ExpectFalse(batteryIsOk(50, 85, 0.0));
-    console.log("All ok");
-    return 0;
-}
+const main = () => {
+  // All normal
+  console.log(
+    assertBatteryCondition(
+      true,
+      isBatteryOk(getBatteryState(25, 70, 0.7)),
+      "Battery condition is good."
+    )
+  );
+
+  // all high
+  console.log(
+    assertBatteryCondition(
+      false,
+      isBatteryOk(getBatteryState(50, 85, 0.9)),
+      "Battery condition is bad."
+    )
+  );
+
+  //all low
+  console.log(
+    assertBatteryCondition(
+      false,
+      isBatteryOk(getBatteryState(-10, 15, -1)),
+      "Battery condition is bad."
+    )
+  );
+
+  // high, high, normal
+  console.log(
+    assertBatteryCondition(
+      false,
+      isBatteryOk(getBatteryState(50, 85, 0.0)),
+      "Battery condition is bad."
+    )
+  );
+
+  // high, normal, normal
+  console.log(
+    assertBatteryCondition(
+      false,
+      isBatteryOk(getBatteryState(50, 60, 0.5)),
+      "Battery condition is bad."
+    )
+  );
+
+  // low, normal, normal
+  console.log(
+    assertBatteryCondition(
+      false,
+      isBatteryOk(getBatteryState(-2, 60, 0.5)),
+      "Battery condition is bad."
+    )
+  );
+
+  // normal, high, normal
+  console.log(
+    assertBatteryCondition(
+      false,
+      isBatteryOk(getBatteryState(25, 90, 0.5)),
+      "Battery condition is bad."
+    )
+  );
+
+  // normal, low, normal
+  console.log(
+    assertBatteryCondition(
+      false,
+      isBatteryOk(getBatteryState(39, 10, 0.5)),
+      "Battery condition is bad."
+    )
+  );
+
+  // normal, normal, high
+  console.log(
+    assertBatteryCondition(
+      false,
+      isBatteryOk(getBatteryState(39, 50, 1.2)),
+      "Battery condition is bad."
+    )
+  );
+
+  // normal, normal, low
+  console.log(
+    assertBatteryCondition(
+      false,
+      isBatteryOk(getBatteryState(39, 45, -0.1)),
+      "Battery condition is bad."
+    )
+  );
+};
 
 main();
